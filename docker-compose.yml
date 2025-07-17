@@ -12,7 +12,7 @@ services:
   vote:
     image: jcampos15/vote:dev
     build:
-      context: vote/
+      context: ./vote
     depends_on:
       - redis
     ports:
@@ -20,29 +20,6 @@ services:
     networks:
       - frontend
   
-  result:
-    image: jcampos15/result:dev
-    build:
-      context: result/
-    depends_on:
-      - db
-    environment:
-      - PORT=80
-    ports:
-      - 8081:80
-    networks:
-      - frontend
-
-  worker:
-    image: jcampos15/worker:dev
-    build:
-      context: worker/
-    depends_on:
-      - redis
-      - db
-    networks:
-      - backend
-
   redis:  # https://geshan.com.np/blog/2022/01/redis-docker/
     image: redis:6.2-alpine
     ports:
@@ -51,6 +28,16 @@ services:
       - redis:/data
     networks:
       - frontend
+      - backend
+
+  worker:
+    image: jcampos15/worker:dev
+    build:
+      context: ./worker
+    depends_on:
+      - redis
+      - db
+    networks:
       - backend
 
   db:  # https://geshan.com.np/blog/2021/12/docker-postgres/#postgresql-with-docker-compose
@@ -62,3 +49,14 @@ services:
     networks:
       - frontend
       - backend
+  
+  result:
+    image: jcampos15/result:dev
+    build:
+      context: ./result
+    depends_on:
+      - db
+    ports:
+      - 8081:80
+    networks:
+      - frontend
